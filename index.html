@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lawful Kaleidoscope</title>
+<meta name="description" content="A browser-native lawful, kaleidoscopic, never-ending pattern generator based on a 60 degree hex/MN field." />
+<style>
+  :root {
+    --bg: #050809;
+    --panel: rgba(7, 14, 16, 0.82);
+    --panel-solid: #071012;
+    --line: rgba(111, 255, 210, 0.24);
+    --line-strong: rgba(111, 255, 210, 0.72);
+    --text: #eafff8;
+    --muted: #9bcac0;
+    --mint: #6fffd2;
+    --blue: #7aa2ff;
+    --gold: #ffcc66;
+    --rose: #ff6b8a;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 18% 8%, rgba(111, 255, 210, 0.14), transparent 28%),
+      radial-gradient(circle at 82% 92%, rgba(122, 162, 255, 0.12), transparent 32%),
+      #050809;
+  }
+
+  canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    display: block;
+  }
+
+  .hud {
+    position: fixed;
+    left: 14px;
+    top: 14px;
+    width: min(360px, calc(100vw - 28px));
+    background: var(--panel);
+    border: 1px solid rgba(111, 255, 210, 0.18);
+    border-radius: 16px;
+    box-shadow: 0 20px 70px rgba(0,0,0,0.55);
+    backdrop-filter: blur(16px);
+    padding: 14px;
+    z-index: 5;
+  }
+
+  .title {
+    margin: 0 0 4px;
+    color: var(--mint);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 15px;
+  }
+
+  .subtitle {
+    margin: 0 0 12px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .controls {
+    display: grid;
+    gap: 10px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .row label {
+    color: var(--text);
+    font-size: 12px;
+  }
+
+  .row output {
+    min-width: 44px;
+    text-align: right;
+    color: var(--gold);
+    font: 12px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  input[type="range"] {
+    grid-column: 1 / -1;
+    width: 100%;
+    accent-color: var(--mint);
+  }
+
+  select, button {
+    border: 1px solid rgba(111, 255, 210, 0.22);
+    border-radius: 10px;
+    background: rgba(4, 10, 11, 0.82);
+    color: var(--text);
+    padding: 8px 10px;
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:hover, select:hover {
+    border-color: rgba(111, 255, 210, 0.56);
+  }
+
+  .button-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+  }
+
+  .button-row button {
+    flex: 1 1 90px;
+  }
+
+  .law {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed rgba(111, 255, 210, 0.22);
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  .pill {
+    display: inline-block;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    border: 1px solid rgba(111, 255, 210, 0.26);
+    color: var(--mint);
+    background: rgba(111, 255, 210, 0.06);
+    letter-spacing: 0.04em;
+  }
+
+  .footer-note {
+    position: fixed;
+    right: 14px;
+    bottom: 14px;
+    max-width: min(520px, calc(100vw - 28px));
+    color: rgba(234, 255, 248, 0.72);
+    font-size: 12px;
+    background: rgba(0,0,0,0.28);
+    padding: 8px 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+  }
+
+  .hidden { display: none; }
+
+  @media (max-width: 680px) {
+    .hud { max-height: calc(100vh - 28px); overflow: auto; }
+    .footer-note { display: none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="field" aria-label="Lawful kaleidoscopic pattern generator"></canvas>
+
+<section class="hud" id="hud">
+  <h1 class="title">Lawful Kaleidoscope</h1>
+  <p class="subtitle">A never-ending 60° MN-field pattern engine.</p>
+
+  <div class="controls">
+    <div class="row">
+      <label for="mode">Seed mode</label>
+      <select id="mode">
+        <option value="bloom">Bloom</option>
+        <option value="weave">Weave</option>
+        <option value="pocket">Pocket</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <label for="symmetry">Symmetry</label>
+      <output id="symmetryOut">12</output>
+      <input id="symmetry" type="range" min="6" max="12" step="6" value="12" />
+    </div>
+
+    <div class="row">
+      <label for="density">Density</label>
+      <output id="densityOut">96</output>
+      <input id="density" type="range" min="24" max="180" step="1" value="96" />
+    </div>
+
+    <div class="row">
+      <label for="speed">Drift speed</label>
+      <output id="speedOut">0.65</output>
+      <input id="speed" type="range" min="0.05" max="2.00" step="0.01" value="0.65" />
+    </div>
+
+    <div class="row">
+      <label for="pulse">Pulse</label>
+      <output id="pulseOut">0.72</output>
+      <input id="pulse" type="range" min="0" max="1.5" step="0.01" value="0.72" />
+    </div>
+
+    <div class="row">
+      <label for="correction">Correction strength</label>
+      <output id="correctionOut">0.55</output>
+      <input id="correction" type="range" min="0" max="1" step="0.01" value="0.55" />
+    </div>
+
+    <div class="row">
+      <label for="trails">Trails</label>
+      <output id="trailsOut">0.10</output>
+      <input id="trails" type="range" min="0.03" max="0.35" step="0.01" value="0.10" />
+    </div>
+
+    <div class="button-row">
+      <button id="pauseBtn">Pause</button>
+      <button id="seedBtn">New lawful seed</button>
+      <button id="pngBtn">Save PNG</button>
+      <button id="hideBtn">Hide panel</button>
+    </div>
+  </div>
+
+  <div class="law">
+    <span class="pill">MN basis</span>
+    <span class="pill">60° field</span>
+    <span class="pill">6/12-fold symmetry</span>
+    <span class="pill">corrective drift</span><br />
+    Motion is constrained by the hexagonal basis m=(1,0), n=(1/2,√3/2). The pattern is generative, not random: each seed is echoed by lawful rotations and softly corrected back toward coherent radii.
+  </div>
+</section>
+
+<div class="footer-note" id="note">Press H to show/hide controls. Press Space to pause. Press R for a new lawful seed.</div>
+
+<script>
+(function(){
+  const canvas = document.getElementById('field');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  const root = document.documentElement;
+
+  const controls = {
+    mode: document.getElementById('mode'),
+    symmetry: document.getElementById('symmetry'),
+    density: document.getElementById('density'),
+    speed: document.getElementById('speed'),
+    pulse: document.getElementById('pulse'),
+    correction: document.getElementById('correction'),
+    trails: document.getElementById('trails')
+  };
+
+  const outputs = {
+    symmetry: document.getElementById('symmetryOut'),
+    density: document.getElementById('densityOut'),
+    speed: document.getElementById('speedOut'),
+    pulse: document.getElementById('pulseOut'),
+    correction: document.getElementById('correctionOut'),
+    trails: document.getElementById('trailsOut')
+  };
+
+  const pauseBtn = document.getElementById('pauseBtn');
+  const seedBtn = document.getElementById('seedBtn');
+  const pngBtn = document.getElementById('pngBtn');
+  const hideBtn = document.getElementById('hideBtn');
+  const hud = document.getElementById('hud');
+
+  const TAU = Math.PI * 2;
+  const SQRT3 = Math.sqrt(3);
+  const DPR_MAX = 2;
+
+  let W = 0, H = 0, CX = 0, CY = 0, SCALE = 1, DPR = 1;
+  let seed = 1;
+  let paused = false;
+  let last = performance.now();
+  let time = 0;
+
+  const palette = [
+    [111, 255, 210],
+    [122, 162, 255],
+    [255, 204, 102],
+    [255, 107, 138]
+  ];
+
+  function rand(){
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 4294967296;
+  }
+
+  function reseed(){
+    seed = (Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0;
+    time = 0;
+    clearHard();
+  }
+
+  function resize(){
+    DPR = Math.min(DPR_MAX, Math.max(1, window.devicePixelRatio || 1));
+    W = window.innerWidth;
+    H = window.innerHeight;
+    CX = W / 2;
+    CY = H / 2;
+    SCALE = Math.min(W, H) * 0.43;
+    canvas.width = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    clearHard();
+  }
+
+  function clearHard(){
+    ctx.save();
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.fillStyle = '#050809';
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+  }
+
+  function syncOutputs(){
+    outputs.symmetry.value = controls.symmetry.value;
+    outputs.density.value = controls.density.value;
+    outputs.speed.value = Number(controls.speed.value).toFixed(2);
+    outputs.pulse.value = Number(controls.pulse.value).toFixed(2);
+    outputs.correction.value = Number(controls.correction.value).toFixed(2);
+    outputs.trails.value = Number(controls.trails.value).toFixed(2);
+  }
+
+  Object.values(controls).forEach(el => {
+    el.addEventListener('input', syncOutputs);
+    el.addEventListener('change', syncOutputs);
+  });
+
+  function mnToXY(m, n){
+    return {
+      x: (m + 0.5 * n) * SCALE,
+      y: (SQRT3 / 2 * n) * SCALE
+    };
+  }
+
+  function rotate(p, a){
+    const c = Math.cos(a), s = Math.sin(a);
+    return { x: p.x * c - p.y * s, y: p.x * s + p.y * c };
+  }
+
+  function drawHexField(alpha){
+    const spacing = SCALE / 9;
+    const extent = Math.ceil(Math.hypot(W, H) / spacing);
+    ctx.save();
+    ctx.translate(CX, CY);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = `rgba(111,255,210,${alpha})`;
+
+    const angles = [0, Math.PI / 3, -Math.PI / 3];
+    for(const theta of angles){
+      const vx = Math.cos(theta), vy = Math.sin(theta);
+      const nx = -Math.sin(theta), ny = Math.cos(theta);
+      for(let k = -extent; k <= extent; k++){
+        const d = k * spacing;
+        const px = nx * d, py = ny * d;
+        const L = Math.hypot(W, H);
+        ctx.beginPath();
+        ctx.moveTo(px - vx * L, py - vy * L);
+        ctx.lineTo(px + vx * L, py + vy * L);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
+  function colorFor(i, a){
+    const c = palette[i % palette.length];
+    return `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+  }
+
+  function drawBloomPoint(t, i, density, correction, pulse){
+    const u = i / density;
+    const law = Math.sin(TAU * (u * 3 + t * 0.071)) + Math.cos(TAU * (u * 5 - t * 0.037));
+    const rBase = 0.10 + 0.82 * Math.pow(u, 0.72);
+    const corrected = rBase + (0.055 * (1 - correction)) * law;
+    const angle = TAU * (u * 2.0 + 0.05 * Math.sin(t * 0.13)) + t * 0.19;
+    const m = corrected * Math.cos(angle) + 0.12 * Math.sin(t * 0.2 + i * 0.3) * pulse;
+    const n = corrected * Math.sin(angle) + 0.12 * Math.cos(t * 0.17 - i * 0.23) * pulse;
+    return mnToXY(m, n);
+  }
+
+  function drawWeavePoint(t, i, density, correction, pulse){
+    const u = i / density;
+    const lane = (i % 6) / 6;
+    const phase = TAU * lane;
+    const wave = Math.sin(TAU * (u * 4.0 + t * 0.055 + lane));
+    const cross = Math.cos(TAU * (u * 7.0 - t * 0.034));
+    const m = (u * 1.85 - 0.92) + 0.18 * wave * pulse;
+    const n = 0.32 * Math.sin(TAU * u + phase + t * 0.25) + 0.16 * cross * (1 - correction * 0.5);
+    return mnToXY(m, n);
+  }
+
+  function drawPocketPoint(t, i, density, correction, pulse){
+    const rowLengths = [8,7,8,7,8,7,8,7,8,7,8];
+    const total = rowLengths.reduce((a,b)=>a+b,0);
+    const id = i % total;
+    let row = 0, col = id;
+    for(let r = 0; r < rowLengths.length; r++){
+      if(col < rowLengths[r]) { row = r; break; }
+      col -= rowLengths[r];
+    }
+    const len = rowLengths[row];
+    const xOffset = len === 8 ? 0 : 0.5;
+    const centerX = 3.5;
+    const centerY = 5 * SQRT3 / 2;
+    const x = xOffset + col - centerX;
+    const y = row * SQRT3 / 2 - centerY;
+    const d = Math.hypot(x, y) || 1;
+    const breathe = 1 + 0.12 * Math.sin(t * 0.8 + d * 1.7) * pulse;
+    const twist = (1 - correction * 0.65) * 0.32 * Math.sin(t * 0.35 + d);
+    const p = rotate({ x: x / 4.8 * breathe, y: y / 4.8 * breathe }, twist);
+    return { x: p.x * SCALE, y: p.y * SCALE };
+  }
+
+  function seedPoint(t, i, density, mode, correction, pulse){
+    if(mode === 'weave') return drawWeavePoint(t, i, density, correction, pulse);
+    if(mode === 'pocket') return drawPocketPoint(t, i, density, correction, pulse);
+    return drawBloomPoint(t, i, density, correction, pulse);
+  }
+
+  function drawPattern(t){
+    const symmetry = Number(controls.symmetry.value);
+    const density = Number(controls.density.value);
+    const correction = Number(controls.correction.value);
+    const pulse = Number(controls.pulse.value);
+    const mode = controls.mode.value;
+
+    ctx.save();
+    ctx.translate(CX, CY);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    const copies = symmetry;
+    for(let i = 0; i < density; i++){
+      const p = seedPoint(t, i, density, mode, correction, pulse);
+      const q = seedPoint(t + 0.008, i + 1, density, mode, correction, pulse);
+      const size = 1.15 + 2.6 * Math.pow(1 - i / density, 1.6);
+      const alpha = 0.10 + 0.34 * Math.pow(1 - i / density, 0.65);
+
+      for(let k = 0; k < copies; k++){
+        const a = TAU * k / copies;
+        const rp = rotate(p, a);
+        const rq = rotate(q, a);
+        const mirror = k % 2 === 1;
+        const y1 = mirror ? -rp.y : rp.y;
+        const y2 = mirror ? -rq.y : rq.y;
+
+        ctx.strokeStyle = colorFor(k + i, alpha);
+        ctx.lineWidth = size;
+        ctx.beginPath();
+        ctx.moveTo(rp.x, y1);
+        ctx.lineTo(rq.x, y2);
+        ctx.stroke();
+
+        if(i % 3 === 0){
+          ctx.fillStyle = colorFor(k + 2, alpha * 0.75);
+          ctx.beginPath();
+          ctx.arc(rp.x, y1, size * 0.88, 0, TAU);
+          ctx.fill();
+        }
+      }
+    }
+
+    ctx.restore();
+  }
+
+  function fade(trails){
+    ctx.save();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = `rgba(5,8,9,${trails})`;
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+  }
+
+  function frame(now){
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    if(!paused){
+      const speed = Number(controls.speed.value);
+      time += dt * speed;
+      fade(Number(controls.trails.value));
+      drawHexField(0.016);
+      drawPattern(time);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function savePNG(){
+    const a = document.createElement('a');
+    a.download = 'lawful-kaleidoscope.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  }
+
+  pauseBtn.addEventListener('click', () => {
+    paused = !paused;
+    pauseBtn.textContent = paused ? 'Resume' : 'Pause';
+  });
+  seedBtn.addEventListener('click', reseed);
+  pngBtn.addEventListener('click', savePNG);
+  hideBtn.addEventListener('click', () => hud.classList.add('hidden'));
+
+  window.addEventListener('keydown', e => {
+    if(e.key === ' '){
+      e.preventDefault();
+      paused = !paused;
+      pauseBtn.textContent = paused ? 'Resume' : 'Pause';
+    }
+    if(e.key === 'r' || e.key === 'R') reseed();
+    if(e.key === 'h' || e.key === 'H') hud.classList.toggle('hidden');
+  });
+
+  window.addEventListener('resize', resize, { passive: true });
+  resize();
+  syncOutputs();
+  reseed();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
