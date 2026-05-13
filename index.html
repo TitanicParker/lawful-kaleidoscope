@@ -5,36 +5,32 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Lawful Geometry Hub</title>
 <style>
-:root{--bg:#050809;--panel:rgba(7,14,16,.86);--text:#eafff8;--muted:#9bcac0;--mint:#6fffd2;--blue:#7aa2ff;--gold:#ffcc66;--rose:#ff6b8a;--safe-bottom:env(safe-area-inset-bottom,0px)}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#050809;color:var(--text);font:16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}body{background:radial-gradient(circle at 18% 8%,rgba(111,255,210,.16),transparent 28%),radial-gradient(circle at 82% 92%,rgba(122,162,255,.13),transparent 32%),#050809;padding:24px;padding-bottom:calc(24px + var(--safe-bottom))}.wrap{max-width:980px;margin:0 auto}.eyebrow{color:var(--mint);letter-spacing:.14em;text-transform:uppercase;font-size:13px;margin:0 0 8px}h1{font-size:clamp(34px,8vw,76px);line-height:.95;margin:0 0 16px;letter-spacing:-.05em}.lead{max-width:760px;color:var(--muted);font-size:clamp(16px,2.4vw,21px);margin:0 0 26px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.card{display:flex;flex-direction:column;min-height:260px;text-decoration:none;color:var(--text);background:var(--panel);border:1px solid rgba(111,255,210,.18);border-radius:22px;padding:20px;box-shadow:0 22px 70px rgba(0,0,0,.4);backdrop-filter:blur(16px);transition:transform .16s ease,border-color .16s ease,background .16s ease}.card:hover{transform:translateY(-3px);border-color:rgba(111,255,210,.55);background:rgba(9,20,22,.92)}.num{width:42px;height:42px;border:1px solid rgba(111,255,210,.35);border-radius:999px;display:grid;place-items:center;color:var(--mint);font-weight:700;margin-bottom:18px}.card h2{font-size:24px;line-height:1.05;margin:0 0 10px}.card p{color:var(--muted);margin:0 0 18px}.tags{margin-top:auto;display:flex;gap:6px;flex-wrap:wrap}.tag{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(255,204,102,.25);border-radius:999px;padding:3px 8px;background:rgba(255,204,102,.06)}.note{margin-top:18px;color:rgba(234,255,248,.62);font-size:13px}.note a{color:var(--mint)}@media(max-width:820px){body{padding:14px}.grid{grid-template-columns:1fr}.card{min-height:210px}h1{font-size:46px}}
+:root{--bg:#050809;--panel:rgba(7,14,16,.9);--text:#eafff8;--muted:#a5d3ca;--mint:#6fffd2;--gold:#ffcc66;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;min-height:100%;background:#050809;color:var(--text);font:18px/1.35 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}body{min-height:100dvh;background:radial-gradient(circle at 18% 8%,rgba(111,255,210,.18),transparent 34%),radial-gradient(circle at 82% 92%,rgba(122,162,255,.15),transparent 34%),#050809}.wrap{min-height:100dvh;display:flex;flex-direction:column;padding:calc(18px + var(--safe-top)) 16px calc(20px + var(--safe-bottom));max-width:760px;margin:0 auto}.eyebrow{color:var(--mint);letter-spacing:.14em;text-transform:uppercase;font-size:12px;margin:0 0 8px;font-weight:700}.hero{flex:0 0 auto}.hero h1{font-size:clamp(44px,13vw,88px);line-height:.9;margin:0 0 12px;letter-spacing:-.06em}.lead{color:var(--muted);font-size:clamp(18px,5vw,25px);line-height:1.22;margin:0 0 16px;max-width:720px}.grid{flex:1;display:grid;grid-template-rows:repeat(3,1fr);gap:12px;min-height:0}.card{display:grid;grid-template-columns:58px 1fr;gap:14px;align-items:center;text-decoration:none;color:var(--text);background:var(--panel);border:1px solid rgba(111,255,210,.22);border-radius:24px;padding:18px;box-shadow:0 20px 58px rgba(0,0,0,.38);backdrop-filter:blur(16px);min-height:0}.card:active{transform:scale(.99);border-color:rgba(111,255,210,.65)}.num{width:54px;height:54px;border:1px solid rgba(111,255,210,.45);border-radius:999px;display:grid;place-items:center;color:var(--mint);font-weight:800;font-size:18px}.card h2{font-size:clamp(24px,7vw,38px);line-height:1;margin:0 0 6px;letter-spacing:-.03em}.card p{font-size:clamp(15px,4vw,20px);line-height:1.25;color:var(--muted);margin:0}.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.tag{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(255,204,102,.28);border-radius:999px;padding:3px 8px;background:rgba(255,204,102,.07);font-weight:700}.note{flex:0 0 auto;margin:14px 2px 0;color:rgba(234,255,248,.66);font-size:13px;text-align:center}@media(min-width:820px){.wrap{padding:34px 24px}.grid{grid-template-columns:repeat(3,1fr);grid-template-rows:none;min-height:330px}.card{grid-template-columns:1fr;align-content:start}.num{margin-bottom:8px}.card h2{font-size:28px}.card p{font-size:16px}.hero h1{font-size:78px}.lead{font-size:22px}}@media(max-height:700px){.hero h1{font-size:40px}.lead{font-size:16px}.card{padding:14px;border-radius:20px}.num{width:46px;height:46px}.card h2{font-size:23px}.card p{font-size:14px}.tags{display:none}.note{display:none}}
 </style>
 </head>
 <body>
 <main class="wrap">
+<section class="hero">
 <p class="eyebrow">Lawful geometry workspace</p>
-<h1>Choose the instrument.</h1>
-<p class="lead">The project has three entry points: the toy cabinet, the construction/decay laboratory, and the pencil-time manifold draughting page.</p>
+<h1>Choose.</h1>
+<p class="lead">Open one instrument. Big touch targets, phone-first layout.</p>
+</section>
 <section class="grid">
 <a class="card" href="cabinet.html">
 <div class="num">01</div>
-<h2>Ten-toy Cabinet</h2>
-<p>The main animated cabinet: kaleidoscope, tri-hex field, pocket manifold, orbits, compass, spirograph, rose, rain, moire, and rings.</p>
-<div class="tags"><span class="tag">10 toys</span><span class="tag">mobile</span><span class="tag">glowing</span></div>
+<div><h2>Ten-toy Cabinet</h2><p>Kaleidoscope, tri-hex field, pocket manifold, orbits, compass, spirograph, rose, rain, moire, and rings.</p><div class="tags"><span class="tag">10 toys</span><span class="tag">glowing</span></div></div>
 </a>
 <a class="card" href="construction-decay.html">
 <div class="num">02</div>
-<h2>Construction / Decay Lab</h2>
-<p>G12, dual medians, lawful image synthesis, self-construction, decay, breathing, and archive ghosts.</p>
-<div class="tags"><span class="tag">G12</span><span class="tag">dual medians</span><span class="tag">decay</span></div>
+<div><h2>Construction Lab</h2><p>Contained G12, dual medians, lawful image construction, decay, and petal assembly.</p><div class="tags"><span class="tag">G12</span><span class="tag">decay</span></div></div>
 </a>
 <a class="card" href="pencil-time.html">
 <div class="num">03</div>
-<h2>Pencil Time Manifold</h2>
-<p>A paper-like simulation of drawing the hex manifold line-by-line in approximate human time.</p>
-<div class="tags"><span class="tag">pencil</span><span class="tag">human time</span><span class="tag">manifold</span></div>
+<div><h2>Pencil Time</h2><p>Quick, bounded pencil-style manifold drawings in a phone-sized paper stage.</p><div class="tags"><span class="tag">pencil</span><span class="tag">human time</span></div></div>
 </a>
 </section>
-<p class="note">The main GitHub Pages URL now opens this hub. Use the cards above to enter each instrument.</p>
+<p class="note">Tap a card to enter. Use the back button inside each instrument to return here.</p>
 </main>
 </body>
 </html>
