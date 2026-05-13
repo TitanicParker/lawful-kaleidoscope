@@ -3,536 +3,85 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lawful Kaleidoscope</title>
-<meta name="description" content="A browser-native lawful, kaleidoscopic, never-ending pattern generator based on a 60 degree hex/MN field." />
+<title>Lawful Kaleidoscope Toy Cabinet</title>
+<meta name="description" content="A browser-native cabinet of lawful 60 degree geometry toys: kaleidoscope, tri-hex field, pocket manifold, and harmonic orbits." />
 <style>
-  :root {
-    --bg: #050809;
-    --panel: rgba(7, 14, 16, 0.82);
-    --panel-solid: #071012;
-    --line: rgba(111, 255, 210, 0.24);
-    --line-strong: rgba(111, 255, 210, 0.72);
-    --text: #eafff8;
-    --muted: #9bcac0;
-    --mint: #6fffd2;
-    --blue: #7aa2ff;
-    --gold: #ffcc66;
-    --rose: #ff6b8a;
+  :root{
+    --bg:#050809; --panel:rgba(7,14,16,.84); --text:#eafff8; --muted:#9bcac0;
+    --mint:#6fffd2; --blue:#7aa2ff; --gold:#ffcc66; --rose:#ff6b8a; --green:#39ff14;
   }
-
-  * { box-sizing: border-box; }
-
-  html, body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: var(--bg);
-    color: var(--text);
-    font: 14px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  }
-
-  body {
-    background:
-      radial-gradient(circle at 18% 8%, rgba(111, 255, 210, 0.14), transparent 28%),
-      radial-gradient(circle at 82% 92%, rgba(122, 162, 255, 0.12), transparent 32%),
-      #050809;
-  }
-
-  canvas {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    display: block;
-  }
-
-  .hud {
-    position: fixed;
-    left: 14px;
-    top: 14px;
-    width: min(360px, calc(100vw - 28px));
-    background: var(--panel);
-    border: 1px solid rgba(111, 255, 210, 0.18);
-    border-radius: 16px;
-    box-shadow: 0 20px 70px rgba(0,0,0,0.55);
-    backdrop-filter: blur(16px);
-    padding: 14px;
-    z-index: 5;
-  }
-
-  .title {
-    margin: 0 0 4px;
-    color: var(--mint);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    font-size: 15px;
-  }
-
-  .subtitle {
-    margin: 0 0 12px;
-    color: var(--muted);
-    font-size: 12px;
-  }
-
-  .controls {
-    display: grid;
-    gap: 10px;
-  }
-
-  .row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 10px;
-    align-items: center;
-  }
-
-  .row label {
-    color: var(--text);
-    font-size: 12px;
-  }
-
-  .row output {
-    min-width: 44px;
-    text-align: right;
-    color: var(--gold);
-    font: 12px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  }
-
-  input[type="range"] {
-    grid-column: 1 / -1;
-    width: 100%;
-    accent-color: var(--mint);
-  }
-
-  select, button {
-    border: 1px solid rgba(111, 255, 210, 0.22);
-    border-radius: 10px;
-    background: rgba(4, 10, 11, 0.82);
-    color: var(--text);
-    padding: 8px 10px;
-    font: inherit;
-  }
-
-  button {
-    cursor: pointer;
-  }
-
-  button:hover, select:hover {
-    border-color: rgba(111, 255, 210, 0.56);
-  }
-
-  .button-row {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 2px;
-  }
-
-  .button-row button {
-    flex: 1 1 90px;
-  }
-
-  .law {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px dashed rgba(111, 255, 210, 0.22);
-    color: var(--muted);
-    font-size: 11px;
-  }
-
-  .pill {
-    display: inline-block;
-    margin-right: 5px;
-    margin-bottom: 5px;
-    padding: 2px 7px;
-    border-radius: 999px;
-    border: 1px solid rgba(111, 255, 210, 0.26);
-    color: var(--mint);
-    background: rgba(111, 255, 210, 0.06);
-    letter-spacing: 0.04em;
-  }
-
-  .footer-note {
-    position: fixed;
-    right: 14px;
-    bottom: 14px;
-    max-width: min(520px, calc(100vw - 28px));
-    color: rgba(234, 255, 248, 0.72);
-    font-size: 12px;
-    background: rgba(0,0,0,0.28);
-    padding: 8px 10px;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-  }
-
-  .hidden { display: none; }
-
-  @media (max-width: 680px) {
-    .hud { max-height: calc(100vh - 28px); overflow: auto; }
-    .footer-note { display: none; }
-  }
+  *{box-sizing:border-box}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  body{background:radial-gradient(circle at 18% 8%,rgba(111,255,210,.14),transparent 28%),radial-gradient(circle at 82% 92%,rgba(122,162,255,.12),transparent 32%),#050809}
+  canvas{position:fixed;inset:0;width:100vw;height:100vh;display:block}
+  .hud{position:fixed;left:14px;top:14px;width:min(390px,calc(100vw - 28px));max-height:calc(100vh - 28px);overflow:auto;background:var(--panel);border:1px solid rgba(111,255,210,.18);border-radius:16px;box-shadow:0 20px 70px rgba(0,0,0,.55);backdrop-filter:blur(16px);padding:14px;z-index:5}
+  .title{margin:0 0 4px;color:var(--mint);letter-spacing:.12em;text-transform:uppercase;font-size:15px}.subtitle{margin:0 0 12px;color:var(--muted);font-size:12px}
+  .controls{display:grid;gap:10px}.row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.row label{font-size:12px}.row output{min-width:48px;text-align:right;color:var(--gold);font:12px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--mint)}select,button{border:1px solid rgba(111,255,210,.22);border-radius:10px;background:rgba(4,10,11,.84);color:var(--text);padding:8px 10px;font:inherit}button{cursor:pointer}button:hover,select:hover{border-color:rgba(111,255,210,.56)}
+  .button-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}.button-row button{flex:1 1 90px}.law{margin-top:12px;padding-top:12px;border-top:1px dashed rgba(111,255,210,.22);color:var(--muted);font-size:11px}.pill{display:inline-block;margin-right:5px;margin-bottom:5px;padding:2px 7px;border-radius:999px;border:1px solid rgba(111,255,210,.26);color:var(--mint);background:rgba(111,255,210,.06);letter-spacing:.04em}
+  .footer-note{position:fixed;right:14px;bottom:14px;max-width:min(560px,calc(100vw - 28px));color:rgba(234,255,248,.72);font-size:12px;background:rgba(0,0,0,.28);padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;backdrop-filter:blur(10px)}.hidden{display:none}@media(max-width:680px){.footer-note{display:none}}
 </style>
 </head>
 <body>
-<canvas id="field" aria-label="Lawful kaleidoscopic pattern generator"></canvas>
-
+<canvas id="field" aria-label="Lawful geometry toy cabinet"></canvas>
 <section class="hud" id="hud">
-  <h1 class="title">Lawful Kaleidoscope</h1>
-  <p class="subtitle">A never-ending 60° MN-field pattern engine.</p>
-
+  <h1 class="title">Lawful Toy Cabinet</h1>
+  <p class="subtitle">Multiple 60° MN-field geometry toys in one page.</p>
   <div class="controls">
-    <div class="row">
-      <label for="mode">Seed mode</label>
-      <select id="mode">
-        <option value="bloom">Bloom</option>
-        <option value="weave">Weave</option>
-        <option value="pocket">Pocket</option>
-      </select>
-    </div>
-
-    <div class="row">
-      <label for="symmetry">Symmetry</label>
-      <output id="symmetryOut">12</output>
-      <input id="symmetry" type="range" min="6" max="12" step="6" value="12" />
-    </div>
-
-    <div class="row">
-      <label for="density">Density</label>
-      <output id="densityOut">96</output>
-      <input id="density" type="range" min="24" max="180" step="1" value="96" />
-    </div>
-
-    <div class="row">
-      <label for="speed">Drift speed</label>
-      <output id="speedOut">0.65</output>
-      <input id="speed" type="range" min="0.05" max="2.00" step="0.01" value="0.65" />
-    </div>
-
-    <div class="row">
-      <label for="pulse">Pulse</label>
-      <output id="pulseOut">0.72</output>
-      <input id="pulse" type="range" min="0" max="1.5" step="0.01" value="0.72" />
-    </div>
-
-    <div class="row">
-      <label for="correction">Correction strength</label>
-      <output id="correctionOut">0.55</output>
-      <input id="correction" type="range" min="0" max="1" step="0.01" value="0.55" />
-    </div>
-
-    <div class="row">
-      <label for="trails">Trails</label>
-      <output id="trailsOut">0.10</output>
-      <input id="trails" type="range" min="0.03" max="0.35" step="0.01" value="0.10" />
-    </div>
-
-    <div class="button-row">
-      <button id="pauseBtn">Pause</button>
-      <button id="seedBtn">New lawful seed</button>
-      <button id="pngBtn">Save PNG</button>
-      <button id="hideBtn">Hide panel</button>
-    </div>
+    <div class="row"><label for="toy">Toy</label><select id="toy"><option value="kaleido">01 · Endless Kaleidoscope</option><option value="trihex">02 · Tri-Hex Field</option><option value="pocket">03 · Pocket Manifold</option><option value="orbits">04 · Harmonic Orbits</option></select></div>
+    <div class="row"><label for="mode">Mode</label><select id="mode"><option value="bloom">Bloom</option><option value="weave">Weave</option><option value="cellular">Cellular</option></select></div>
+    <div class="row"><label for="symmetry">Symmetry</label><output id="symmetryOut">12</output><input id="symmetry" type="range" min="6" max="12" step="6" value="12"></div>
+    <div class="row"><label for="density">Density / extent</label><output id="densityOut">96</output><input id="density" type="range" min="24" max="180" step="1" value="96"></div>
+    <div class="row"><label for="speed">Speed</label><output id="speedOut">0.65</output><input id="speed" type="range" min="0.05" max="2.00" step="0.01" value="0.65"></div>
+    <div class="row"><label for="pulse">Pulse</label><output id="pulseOut">0.72</output><input id="pulse" type="range" min="0" max="1.5" step="0.01" value="0.72"></div>
+    <div class="row"><label for="correction">Correction</label><output id="correctionOut">0.55</output><input id="correction" type="range" min="0" max="1" step="0.01" value="0.55"></div>
+    <div class="row"><label for="trails">Trails / fade</label><output id="trailsOut">0.10</output><input id="trails" type="range" min="0.03" max="0.35" step="0.01" value="0.10"></div>
+    <div class="button-row"><button id="pauseBtn">Pause</button><button id="seedBtn">New lawful seed</button><button id="pngBtn">Save PNG</button><button id="hideBtn">Hide panel</button></div>
   </div>
-
-  <div class="law">
-    <span class="pill">MN basis</span>
-    <span class="pill">60° field</span>
-    <span class="pill">6/12-fold symmetry</span>
-    <span class="pill">corrective drift</span><br />
-    Motion is constrained by the hexagonal basis m=(1,0), n=(1/2,√3/2). The pattern is generative, not random: each seed is echoed by lawful rotations and softly corrected back toward coherent radii.
-  </div>
+  <div class="law" id="caption"><span class="pill">MN basis</span><span class="pill">60° field</span><span class="pill">toy cabinet</span><br>Choose a toy. Each one obeys the same hexagonal basis: m=(1,0), n=(1/2,√3/2).</div>
 </section>
-
-<div class="footer-note" id="note">Press H to show/hide controls. Press Space to pause. Press R for a new lawful seed.</div>
-
+<div class="footer-note">H show/hide · Space pause · R new seed · 1/2/3/4 switch toys · S save PNG</div>
 <script>
 (function(){
-  const canvas = document.getElementById('field');
-  const ctx = canvas.getContext('2d', { alpha: false });
-  const root = document.documentElement;
+  const canvas=document.getElementById('field'),ctx=canvas.getContext('2d',{alpha:false});
+  const $=id=>document.getElementById(id);const TAU=Math.PI*2,SQRT3=Math.sqrt(3);let W=0,H=0,CX=0,CY=0,SCALE=1,DPR=1,time=0,last=performance.now(),paused=false,seed=1;
+  const controls={toy:$('toy'),mode:$('mode'),symmetry:$('symmetry'),density:$('density'),speed:$('speed'),pulse:$('pulse'),correction:$('correction'),trails:$('trails')};
+  const outputs={symmetry:$('symmetryOut'),density:$('densityOut'),speed:$('speedOut'),pulse:$('pulseOut'),correction:$('correctionOut'),trails:$('trailsOut')};
+  const pauseBtn=$('pauseBtn'),seedBtn=$('seedBtn'),pngBtn=$('pngBtn'),hideBtn=$('hideBtn'),hud=$('hud'),caption=$('caption');
+  const palette=[[111,255,210],[122,162,255],[255,204,102],[255,107,138],[57,255,20]];
 
-  const controls = {
-    mode: document.getElementById('mode'),
-    symmetry: document.getElementById('symmetry'),
-    density: document.getElementById('density'),
-    speed: document.getElementById('speed'),
-    pulse: document.getElementById('pulse'),
-    correction: document.getElementById('correction'),
-    trails: document.getElementById('trails')
-  };
+  function resize(){DPR=Math.min(2,Math.max(1,devicePixelRatio||1));W=innerWidth;H=innerHeight;CX=W/2;CY=H/2;SCALE=Math.min(W,H)*.43;canvas.width=Math.floor(W*DPR);canvas.height=Math.floor(H*DPR);canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0);clearHard()}
+  function clearHard(){ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#050809';ctx.fillRect(0,0,W,H);ctx.restore()}
+  function sync(){outputs.symmetry.value=controls.symmetry.value;outputs.density.value=controls.density.value;outputs.speed.value=(+controls.speed.value).toFixed(2);outputs.pulse.value=(+controls.pulse.value).toFixed(2);outputs.correction.value=(+controls.correction.value).toFixed(2);outputs.trails.value=(+controls.trails.value).toFixed(2);updateCaption()}Object.values(controls).forEach(el=>{el.addEventListener('input',sync);el.addEventListener('change',()=>{sync();clearHard()})});
+  function updateCaption(){const toy=controls.toy.value;const text={kaleido:'Endless Kaleidoscope: a seed is rotated, mirrored, pulsed, and corrected into coherent non-repeating motion.',trihex:'Tri-Hex Field: primal 0°, +60°, -60° families and optional dual-feeling interference lines breathe across the field.',pocket:'Pocket Manifold: an 83-point bounded lattice with six-neighbor structure, animated as a living relational object.',orbits:'Harmonic Orbits: lawful particles follow hex-constrained orbital waves and leave coherent trails.'}[toy];caption.innerHTML='<span class="pill">MN basis</span><span class="pill">60° field</span><span class="pill">'+toy+'</span><br>'+text}
+  function reseed(){seed=(Date.now()^Math.floor(Math.random()*0xffffffff))>>>0;time=0;clearHard()}function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
+  function mnToXY(m,n,scale=SCALE){return{x:(m+.5*n)*scale,y:(SQRT3/2*n)*scale}}function rot(p,a){const c=Math.cos(a),s=Math.sin(a);return{x:p.x*c-p.y*s,y:p.x*s+p.y*c}}function col(i,a){const c=palette[i%palette.length];return`rgba(${c[0]},${c[1]},${c[2]},${a})`}
+  function fade(a){ctx.save();ctx.globalCompositeOperation='source-over';ctx.fillStyle=`rgba(5,8,9,${a})`;ctx.fillRect(0,0,W,H);ctx.restore()}
 
-  const outputs = {
-    symmetry: document.getElementById('symmetryOut'),
-    density: document.getElementById('densityOut'),
-    speed: document.getElementById('speedOut'),
-    pulse: document.getElementById('pulseOut'),
-    correction: document.getElementById('correctionOut'),
-    trails: document.getElementById('trailsOut')
-  };
+  function drawLineFamily(theta,spacing,color,alpha,phase=0){const vx=Math.cos(theta),vy=Math.sin(theta),nx=-Math.sin(theta),ny=Math.cos(theta),L=Math.hypot(W,H),extent=Math.ceil(L/spacing);ctx.strokeStyle=color.replace('ALPHA',alpha);ctx.lineWidth=1;for(let k=-extent;k<=extent;k++){const d=(k+phase)*spacing,px=nx*d,py=ny*d;ctx.beginPath();ctx.moveTo(px-vx*L,py-vy*L);ctx.lineTo(px+vx*L,py+vy*L);ctx.stroke()}}
+  function hexField(alpha=.018,phase=0,dual=false){ctx.save();ctx.translate(CX,CY);const spacing=SCALE/9;[0,Math.PI/3,-Math.PI/3].forEach(a=>drawLineFamily(a,spacing,'rgba(111,255,210,ALPHA)',alpha,phase));if(dual)[Math.PI/6,Math.PI/2,5*Math.PI/6].forEach(a=>drawLineFamily(a,spacing/SQRT3,'rgba(122,162,255,ALPHA)',alpha*.9,-phase*.7));ctx.restore()}
 
-  const pauseBtn = document.getElementById('pauseBtn');
-  const seedBtn = document.getElementById('seedBtn');
-  const pngBtn = document.getElementById('pngBtn');
-  const hideBtn = document.getElementById('hideBtn');
-  const hud = document.getElementById('hud');
+  function bloomPoint(t,i,d,cor,pulse){const u=i/d,law=Math.sin(TAU*(u*3+t*.071))+Math.cos(TAU*(u*5-t*.037)),r=.10+.82*Math.pow(u,.72)+(.055*(1-cor))*law,a=TAU*(u*2+.05*Math.sin(t*.13))+t*.19;return mnToXY(r*Math.cos(a)+.12*Math.sin(t*.2+i*.3)*pulse,r*Math.sin(a)+.12*Math.cos(t*.17-i*.23)*pulse)}
+  function weavePoint(t,i,d,cor,pulse){const u=i/d,lane=(i%6)/6,phase=TAU*lane,w=Math.sin(TAU*(u*4+t*.055+lane)),x=Math.cos(TAU*(u*7-t*.034));return mnToXY((u*1.85-.92)+.18*w*pulse,.32*Math.sin(TAU*u+phase+t*.25)+.16*x*(1-cor*.5))}
+  function cellularPoint(t,i,d,cor,pulse){const rowLengths=[8,7,8,7,8,7,8,7,8,7,8],total=83,id=i%total;let row=0,col=id;for(let r=0;r<rowLengths.length;r++){if(col<rowLengths[r]){row=r;break}col-=rowLengths[r]}const len=rowLengths[row],xo=len===8?0:.5,x=xo+col-3.5,y=row*SQRT3/2-5*SQRT3/2,dist=Math.hypot(x,y)||1,b=1+.12*Math.sin(t*.8+dist*1.7)*pulse,tw=(1-cor*.65)*.32*Math.sin(t*.35+dist);const p=rot({x:x/4.8*b,y:y/4.8*b},tw);return{x:p.x*SCALE,y:p.y*SCALE}}
+  function seedPoint(t,i,d){const mode=controls.mode.value,cor=+controls.correction.value,pulse=+controls.pulse.value;if(mode==='weave')return weavePoint(t,i,d,cor,pulse);if(mode==='cellular')return cellularPoint(t,i,d,cor,pulse);return bloomPoint(t,i,d,cor,pulse)}
 
-  const TAU = Math.PI * 2;
-  const SQRT3 = Math.sqrt(3);
-  const DPR_MAX = 2;
+  function toyKaleido(t){hexField(.014,0,false);const sym=+controls.symmetry.value,d=+controls.density.value;ctx.save();ctx.translate(CX,CY);ctx.globalCompositeOperation='lighter';ctx.lineCap='round';for(let i=0;i<d;i++){const p=seedPoint(t,i,d),q=seedPoint(t+.008,i+1,d),size=1.15+2.6*Math.pow(1-i/d,1.6),alpha=.10+.34*Math.pow(1-i/d,.65);for(let k=0;k<sym;k++){const a=TAU*k/sym,rp=rot(p,a),rq=rot(q,a),mirror=k%2===1,y1=mirror?-rp.y:rp.y,y2=mirror?-rq.y:rq.y;ctx.strokeStyle=col(k+i,alpha);ctx.lineWidth=size;ctx.beginPath();ctx.moveTo(rp.x,y1);ctx.lineTo(rq.x,y2);ctx.stroke();if(i%3===0){ctx.fillStyle=col(k+2,alpha*.75);ctx.beginPath();ctx.arc(rp.x,y1,size*.88,0,TAU);ctx.fill()}}}ctx.restore()}
 
-  let W = 0, H = 0, CX = 0, CY = 0, SCALE = 1, DPR = 1;
-  let seed = 1;
-  let paused = false;
-  let last = performance.now();
-  let time = 0;
+  function toyTrihex(t){clearSoft(.075);ctx.save();ctx.translate(CX,CY);const phase=(t*.12)%1;drawLineFamily(0,SCALE/10,'rgba(111,255,210,ALPHA)',.42,phase);drawLineFamily(Math.PI/3,SCALE/10,'rgba(111,255,210,ALPHA)',.42,phase);drawLineFamily(-Math.PI/3,SCALE/10,'rgba(111,255,210,ALPHA)',.42,phase);drawLineFamily(Math.PI/6,SCALE/10/SQRT3,'rgba(122,162,255,ALPHA)',.23,-phase);drawLineFamily(Math.PI/2,SCALE/10/SQRT3,'rgba(122,162,255,ALPHA)',.23,-phase);drawLineFamily(5*Math.PI/6,SCALE/10/SQRT3,'rgba(122,162,255,ALPHA)',.23,-phase);ctx.globalCompositeOperation='lighter';const N=Math.min(130,+controls.density.value);for(let a=-N;a<=N;a+=8){for(let b=-N;b<=N;b+=8){const p=mnToXY(a/18,b/18,SCALE);const r=1.1+1.6*Math.sin(t+a*.07+b*.09);ctx.fillStyle='rgba(57,255,20,.68)';ctx.beginPath();ctx.arc(p.x,p.y,Math.max(.7,r),0,TAU);ctx.fill()}}ctx.restore()}
+  function clearSoft(a){ctx.save();ctx.fillStyle=`rgba(5,8,9,${a})`;ctx.fillRect(0,0,W,H);ctx.restore()}
 
-  const palette = [
-    [111, 255, 210],
-    [122, 162, 255],
-    [255, 204, 102],
-    [255, 107, 138]
-  ];
+  function pocketPoints(){const pts=[],rowLengths=[8,7,8,7,8,7,8,7,8,7,8];for(let r=0;r<rowLengths.length;r++){const len=rowLengths[r],xo=len===8?0:.5;for(let c=0;c<len;c++)pts.push({row:r,col:c,x:xo+c-3.5,y:r*SQRT3/2-5*SQRT3/2,len})}return pts}
+  const pocket=pocketPoints();
+  function toyPocket(t){hexField(.012,0,false);ctx.save();ctx.translate(CX,CY);ctx.globalCompositeOperation='lighter';const s=SCALE/5.6;for(let i=0;i<pocket.length;i++){const p=pocket[i],b=1+.07*Math.sin(t*.8+i*.21),tw=.16*Math.sin(t*.27+Math.hypot(p.x,p.y));let q=rot({x:p.x*s*b,y:p.y*s*b},tw);for(let j=i+1;j<pocket.length;j++){const r=pocket[j];if(Math.hypot((p.x-r.x),(p.y-r.y))<1.02){let v=rot({x:r.x*s*b,y:r.y*s*b},tw);ctx.strokeStyle='rgba(111,255,210,.18)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(v.x,v.y);ctx.stroke()}}const boundary=p.row===0||p.row===10||p.col===0||p.col===p.len-1;ctx.fillStyle=boundary?'rgba(255,204,102,.88)':'rgba(111,255,210,.88)';ctx.beginPath();ctx.arc(q.x,q.y,boundary?3.0:2.2,0,TAU);ctx.fill()}ctx.restore()}
 
-  function rand(){
-    seed = (seed * 1664525 + 1013904223) >>> 0;
-    return seed / 4294967296;
-  }
+  function toyOrbits(t){hexField(.010,0,true);ctx.save();ctx.translate(CX,CY);ctx.globalCompositeOperation='lighter';const count=+controls.density.value,sym=+controls.symmetry.value,pulse=+controls.pulse.value;for(let i=0;i<count;i++){const u=i/count,base=.12+.84*u,w1=TAU*(u*3+t*(.06+.03*(i%5))),w2=TAU*(u*5-t*.04),m=base*Math.cos(w1)+.18*Math.cos(w2)*pulse,n=base*Math.sin(w1)+.18*Math.sin(w2+TAU/6)*pulse,p=mnToXY(m,n);for(let k=0;k<sym;k++){const q=rot(p,TAU*k/sym);ctx.fillStyle=col(i+k,.12+.5*(1-u));ctx.beginPath();ctx.arc(q.x,q.y,1.2+2.8*(1-u),0,TAU);ctx.fill()}}ctx.restore()}
 
-  function reseed(){
-    seed = (Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0;
-    time = 0;
-    clearHard();
-  }
-
-  function resize(){
-    DPR = Math.min(DPR_MAX, Math.max(1, window.devicePixelRatio || 1));
-    W = window.innerWidth;
-    H = window.innerHeight;
-    CX = W / 2;
-    CY = H / 2;
-    SCALE = Math.min(W, H) * 0.43;
-    canvas.width = Math.floor(W * DPR);
-    canvas.height = Math.floor(H * DPR);
-    canvas.style.width = W + 'px';
-    canvas.style.height = H + 'px';
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    clearHard();
-  }
-
-  function clearHard(){
-    ctx.save();
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    ctx.fillStyle = '#050809';
-    ctx.fillRect(0, 0, W, H);
-    ctx.restore();
-  }
-
-  function syncOutputs(){
-    outputs.symmetry.value = controls.symmetry.value;
-    outputs.density.value = controls.density.value;
-    outputs.speed.value = Number(controls.speed.value).toFixed(2);
-    outputs.pulse.value = Number(controls.pulse.value).toFixed(2);
-    outputs.correction.value = Number(controls.correction.value).toFixed(2);
-    outputs.trails.value = Number(controls.trails.value).toFixed(2);
-  }
-
-  Object.values(controls).forEach(el => {
-    el.addEventListener('input', syncOutputs);
-    el.addEventListener('change', syncOutputs);
-  });
-
-  function mnToXY(m, n){
-    return {
-      x: (m + 0.5 * n) * SCALE,
-      y: (SQRT3 / 2 * n) * SCALE
-    };
-  }
-
-  function rotate(p, a){
-    const c = Math.cos(a), s = Math.sin(a);
-    return { x: p.x * c - p.y * s, y: p.x * s + p.y * c };
-  }
-
-  function drawHexField(alpha){
-    const spacing = SCALE / 9;
-    const extent = Math.ceil(Math.hypot(W, H) / spacing);
-    ctx.save();
-    ctx.translate(CX, CY);
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = `rgba(111,255,210,${alpha})`;
-
-    const angles = [0, Math.PI / 3, -Math.PI / 3];
-    for(const theta of angles){
-      const vx = Math.cos(theta), vy = Math.sin(theta);
-      const nx = -Math.sin(theta), ny = Math.cos(theta);
-      for(let k = -extent; k <= extent; k++){
-        const d = k * spacing;
-        const px = nx * d, py = ny * d;
-        const L = Math.hypot(W, H);
-        ctx.beginPath();
-        ctx.moveTo(px - vx * L, py - vy * L);
-        ctx.lineTo(px + vx * L, py + vy * L);
-        ctx.stroke();
-      }
-    }
-    ctx.restore();
-  }
-
-  function colorFor(i, a){
-    const c = palette[i % palette.length];
-    return `rgba(${c[0]},${c[1]},${c[2]},${a})`;
-  }
-
-  function drawBloomPoint(t, i, density, correction, pulse){
-    const u = i / density;
-    const law = Math.sin(TAU * (u * 3 + t * 0.071)) + Math.cos(TAU * (u * 5 - t * 0.037));
-    const rBase = 0.10 + 0.82 * Math.pow(u, 0.72);
-    const corrected = rBase + (0.055 * (1 - correction)) * law;
-    const angle = TAU * (u * 2.0 + 0.05 * Math.sin(t * 0.13)) + t * 0.19;
-    const m = corrected * Math.cos(angle) + 0.12 * Math.sin(t * 0.2 + i * 0.3) * pulse;
-    const n = corrected * Math.sin(angle) + 0.12 * Math.cos(t * 0.17 - i * 0.23) * pulse;
-    return mnToXY(m, n);
-  }
-
-  function drawWeavePoint(t, i, density, correction, pulse){
-    const u = i / density;
-    const lane = (i % 6) / 6;
-    const phase = TAU * lane;
-    const wave = Math.sin(TAU * (u * 4.0 + t * 0.055 + lane));
-    const cross = Math.cos(TAU * (u * 7.0 - t * 0.034));
-    const m = (u * 1.85 - 0.92) + 0.18 * wave * pulse;
-    const n = 0.32 * Math.sin(TAU * u + phase + t * 0.25) + 0.16 * cross * (1 - correction * 0.5);
-    return mnToXY(m, n);
-  }
-
-  function drawPocketPoint(t, i, density, correction, pulse){
-    const rowLengths = [8,7,8,7,8,7,8,7,8,7,8];
-    const total = rowLengths.reduce((a,b)=>a+b,0);
-    const id = i % total;
-    let row = 0, col = id;
-    for(let r = 0; r < rowLengths.length; r++){
-      if(col < rowLengths[r]) { row = r; break; }
-      col -= rowLengths[r];
-    }
-    const len = rowLengths[row];
-    const xOffset = len === 8 ? 0 : 0.5;
-    const centerX = 3.5;
-    const centerY = 5 * SQRT3 / 2;
-    const x = xOffset + col - centerX;
-    const y = row * SQRT3 / 2 - centerY;
-    const d = Math.hypot(x, y) || 1;
-    const breathe = 1 + 0.12 * Math.sin(t * 0.8 + d * 1.7) * pulse;
-    const twist = (1 - correction * 0.65) * 0.32 * Math.sin(t * 0.35 + d);
-    const p = rotate({ x: x / 4.8 * breathe, y: y / 4.8 * breathe }, twist);
-    return { x: p.x * SCALE, y: p.y * SCALE };
-  }
-
-  function seedPoint(t, i, density, mode, correction, pulse){
-    if(mode === 'weave') return drawWeavePoint(t, i, density, correction, pulse);
-    if(mode === 'pocket') return drawPocketPoint(t, i, density, correction, pulse);
-    return drawBloomPoint(t, i, density, correction, pulse);
-  }
-
-  function drawPattern(t){
-    const symmetry = Number(controls.symmetry.value);
-    const density = Number(controls.density.value);
-    const correction = Number(controls.correction.value);
-    const pulse = Number(controls.pulse.value);
-    const mode = controls.mode.value;
-
-    ctx.save();
-    ctx.translate(CX, CY);
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    const copies = symmetry;
-    for(let i = 0; i < density; i++){
-      const p = seedPoint(t, i, density, mode, correction, pulse);
-      const q = seedPoint(t + 0.008, i + 1, density, mode, correction, pulse);
-      const size = 1.15 + 2.6 * Math.pow(1 - i / density, 1.6);
-      const alpha = 0.10 + 0.34 * Math.pow(1 - i / density, 0.65);
-
-      for(let k = 0; k < copies; k++){
-        const a = TAU * k / copies;
-        const rp = rotate(p, a);
-        const rq = rotate(q, a);
-        const mirror = k % 2 === 1;
-        const y1 = mirror ? -rp.y : rp.y;
-        const y2 = mirror ? -rq.y : rq.y;
-
-        ctx.strokeStyle = colorFor(k + i, alpha);
-        ctx.lineWidth = size;
-        ctx.beginPath();
-        ctx.moveTo(rp.x, y1);
-        ctx.lineTo(rq.x, y2);
-        ctx.stroke();
-
-        if(i % 3 === 0){
-          ctx.fillStyle = colorFor(k + 2, alpha * 0.75);
-          ctx.beginPath();
-          ctx.arc(rp.x, y1, size * 0.88, 0, TAU);
-          ctx.fill();
-        }
-      }
-    }
-
-    ctx.restore();
-  }
-
-  function fade(trails){
-    ctx.save();
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = `rgba(5,8,9,${trails})`;
-    ctx.fillRect(0, 0, W, H);
-    ctx.restore();
-  }
-
-  function frame(now){
-    const dt = Math.min(0.05, (now - last) / 1000);
-    last = now;
-    if(!paused){
-      const speed = Number(controls.speed.value);
-      time += dt * speed;
-      fade(Number(controls.trails.value));
-      drawHexField(0.016);
-      drawPattern(time);
-    }
-    requestAnimationFrame(frame);
-  }
-
-  function savePNG(){
-    const a = document.createElement('a');
-    a.download = 'lawful-kaleidoscope.png';
-    a.href = canvas.toDataURL('image/png');
-    a.click();
-  }
-
-  pauseBtn.addEventListener('click', () => {
-    paused = !paused;
-    pauseBtn.textContent = paused ? 'Resume' : 'Pause';
-  });
-  seedBtn.addEventListener('click', reseed);
-  pngBtn.addEventListener('click', savePNG);
-  hideBtn.addEventListener('click', () => hud.classList.add('hidden'));
-
-  window.addEventListener('keydown', e => {
-    if(e.key === ' '){
-      e.preventDefault();
-      paused = !paused;
-      pauseBtn.textContent = paused ? 'Resume' : 'Pause';
-    }
-    if(e.key === 'r' || e.key === 'R') reseed();
-    if(e.key === 'h' || e.key === 'H') hud.classList.toggle('hidden');
-  });
-
-  window.addEventListener('resize', resize, { passive: true });
-  resize();
-  syncOutputs();
-  reseed();
-  requestAnimationFrame(frame);
+  function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!paused){time+=dt*(+controls.speed.value);const toy=controls.toy.value;if(toy==='trihex')toyTrihex(time);else{fade(+controls.trails.value);if(toy==='pocket')toyPocket(time);else if(toy==='orbits')toyOrbits(time);else toyKaleido(time)}}requestAnimationFrame(frame)}
+  function savePNG(){const a=document.createElement('a');a.download='lawful-toy.png';a.href=canvas.toDataURL('image/png');a.click()}
+  pauseBtn.onclick=()=>{paused=!paused;pauseBtn.textContent=paused?'Resume':'Pause'};seedBtn.onclick=reseed;pngBtn.onclick=savePNG;hideBtn.onclick=()=>hud.classList.add('hidden');
+  addEventListener('keydown',e=>{if(e.key===' '){e.preventDefault();paused=!paused;pauseBtn.textContent=paused?'Resume':'Pause'}if(e.key==='r'||e.key==='R')reseed();if(e.key==='h'||e.key==='H')hud.classList.toggle('hidden');if(e.key==='s'||e.key==='S')savePNG();if(['1','2','3','4'].includes(e.key)){controls.toy.selectedIndex=+e.key-1;sync();clearHard()}});
+  addEventListener('resize',resize,{passive:true});resize();sync();reseed();requestAnimationFrame(frame);
 })();
 </script>
 </body>
